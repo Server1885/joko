@@ -1,0 +1,556 @@
+/* =========================================================
+   Гүлім үшін — романтикалық сайт
+   Токендер: түс, қаріп, аралық
+   ========================================================= */
+
+:root{
+  --bg-deep: #100812;
+  --bg-deep-2: #170a1c;
+  --rose: #ff6fa5;
+  --rose-soft: #ffb4cf;
+  --violet: #a86bff;
+  --violet-deep: #6a3fb5;
+  --crimson: #ff4d6d;
+  --gold: #ffd7a8;
+  --text-main: #f6ecf3;
+  --text-soft: #d9c3d6;
+  --text-muted: #a98fa9;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: rgba(168, 60, 130, 0.25);
+
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-ui: 'Manrope', sans-serif;
+
+  --ease-soft: cubic-bezier(.22,.68,.32,1);
+}
+
+*{ box-sizing: border-box; }
+
+html{
+  scroll-behavior: smooth;
+}
+
+body{
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(168,107,255,0.18), transparent 60%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-deep-2) 100%);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- фон: жарық дақтары + жүрек canvas ---------- */
+
+.bg-glow{
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+.bg-glow--one{
+  width: 45vw; height: 45vw;
+  top: -10%; left: -10%;
+  background: radial-gradient(circle, var(--violet-deep), transparent 70%);
+  animation: driftOne 22s ease-in-out infinite alternate;
+}
+.bg-glow--two{
+  width: 40vw; height: 40vw;
+  bottom: -5%; right: -10%;
+  background: radial-gradient(circle, var(--crimson), transparent 70%);
+  animation: driftTwo 26s ease-in-out infinite alternate;
+}
+.bg-glow--three{
+  width: 30vw; height: 30vw;
+  top: 40%; left: 50%;
+  background: radial-gradient(circle, var(--rose), transparent 72%);
+  opacity: 0.28;
+  animation: driftThree 30s ease-in-out infinite alternate;
+}
+@keyframes driftOne{ from{ transform: translate(0,0);} to{ transform: translate(6vw, 8vh);} }
+@keyframes driftTwo{ from{ transform: translate(0,0);} to{ transform: translate(-5vw, -6vh);} }
+@keyframes driftThree{ from{ transform: translate(-50%,-50%) scale(1);} to{ transform: translate(-45%,-55%) scale(1.15);} }
+
+#heartsCanvas{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ---------- жалпы бет орналасуы ---------- */
+
+.screen{
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8vh 6vw;
+  text-align: center;
+}
+
+.section-label{
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose-soft);
+  opacity: 0.75;
+  margin: 0 0 1.2rem;
+}
+.eyebrow{
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--rose-soft);
+  opacity: 0.8;
+  margin: 0 0 1.4rem;
+}
+
+.section-title{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin: 0 0 3rem;
+  background: linear-gradient(100deg, var(--rose-soft), var(--gold) 55%, var(--rose-soft));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.heart-emoji{ display: inline-block; }
+.accent{
+  background: linear-gradient(100deg, var(--rose), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- glassmorphism карточкасы ---------- */
+
+.glass-card{
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 20px 60px var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* ---------- батырмалар ---------- */
+
+.btn{
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  padding: 1rem 2.1rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-main);
+  transition: transform 0.35s var(--ease-soft), box-shadow 0.35s var(--ease-soft);
+  isolation: isolate;
+  overflow: hidden;
+}
+.btn::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  transition: opacity 0.35s ease;
+}
+.btn--primary::before{
+  background: linear-gradient(120deg, var(--crimson), var(--violet) 90%);
+}
+.btn--primary{
+  box-shadow: 0 12px 30px rgba(255, 77, 109, 0.35);
+}
+.btn--secondary::before{
+  background: linear-gradient(120deg, var(--violet-deep), var(--rose));
+}
+.btn--secondary{
+  box-shadow: 0 12px 30px rgba(168, 107, 255, 0.3);
+}
+.btn:hover{
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(255, 77, 109, 0.45);
+}
+.btn:active{
+  transform: translateY(0) scale(0.97);
+}
+.btn:focus-visible{
+  outline: 2px solid var(--rose-soft);
+  outline-offset: 3px;
+}
+
+/* ---------- 1. Hero ---------- */
+
+.hero__content{
+  max-width: 760px;
+}
+.hero__title{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  line-height: 1.25;
+  margin: 0 0 1.6rem;
+}
+.hero__subtitle{
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+  color: var(--text-soft);
+  line-height: 1.7;
+  max-width: 560px;
+  margin: 0 auto 2.6rem;
+}
+
+.scroll-hint{
+  position: absolute;
+  bottom: 4vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 60px;
+}
+.scroll-hint__line{
+  display: block;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--rose-soft), transparent);
+  animation: scrollPulse 2.2s ease-in-out infinite;
+}
+@keyframes scrollPulse{
+  0%, 100%{ opacity: 0.25; transform: scaleY(0.6); transform-origin: top; }
+  50%{ opacity: 1; transform: scaleY(1); transform-origin: top; }
+}
+
+/* ---------- 2. Confession ---------- */
+
+.confession__card{
+  max-width: 720px;
+  padding: clamp(2rem, 5vw, 3.6rem);
+}
+.confession__text{
+  font-family: var(--font-body);
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+  line-height: 1.9;
+  color: var(--text-soft);
+  white-space: pre-line;
+  text-align: left;
+  min-height: 1em;
+}
+.confession__text::after{
+  content: '';
+}
+
+/* ---------- 3. Reasons ---------- */
+
+.reasons__grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.4rem;
+  max-width: 980px;
+  width: 100%;
+}
+.reason-card{
+  padding: 2.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.45s var(--ease-soft), box-shadow 0.45s var(--ease-soft), border-color 0.45s ease;
+}
+.reason-card__icon{
+  font-size: 2.1rem;
+  filter: drop-shadow(0 4px 12px rgba(255,111,165,0.4));
+  transition: transform 0.45s var(--ease-soft);
+}
+.reason-card__text{
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-soft);
+  margin: 0;
+  line-height: 1.5;
+}
+.reason-card:hover{
+  transform: translateY(-10px);
+  border-color: rgba(255,180,207,0.5);
+  box-shadow: 0 25px 50px rgba(255, 77, 109, 0.3);
+}
+.reason-card:hover .reason-card__icon{
+  transform: scale(1.2) rotate(-6deg);
+}
+
+/* ---------- 4. Question ---------- */
+
+.question__content{
+  max-width: 640px;
+}
+.question__text{
+  font-family: var(--font-body);
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+  color: var(--text-soft);
+  margin: 0 0 2.2rem;
+}
+
+.answer{
+  margin-top: 2.4rem;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.9s var(--ease-soft), opacity 0.9s var(--ease-soft);
+}
+.answer.is-open{
+  max-height: 400px;
+  opacity: 1;
+}
+.answer__heart{
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.2rem;
+  animation: heartBeat 1.4s ease-in-out infinite;
+}
+.answer__heart-svg{
+  width: 100%;
+  height: 100%;
+  fill: var(--crimson);
+  filter: drop-shadow(0 0 18px rgba(255, 77, 109, 0.7));
+}
+@keyframes heartBeat{
+  0%, 100%{ transform: scale(1); }
+  25%{ transform: scale(1.15); }
+  40%{ transform: scale(0.95); }
+  60%{ transform: scale(1.1); }
+}
+.answer__text{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  color: var(--rose-soft);
+}
+
+/* ---------- 5. Memories timeline ---------- */
+
+.timeline{
+  position: relative;
+  max-width: 560px;
+  width: 100%;
+  padding-left: 2.2rem;
+}
+.timeline::before{
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--rose), var(--violet), transparent);
+}
+.timeline__item{
+  position: relative;
+  text-align: left;
+  padding: 1.1rem 0;
+}
+.timeline__dot{
+  position: absolute;
+  left: -2.2rem;
+  top: 1.4rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--rose);
+  box-shadow: 0 0 0 4px rgba(255,111,165,0.18), 0 0 14px rgba(255,111,165,0.7);
+}
+.timeline__dot--future{
+  background: var(--gold);
+  box-shadow: 0 0 0 4px rgba(255,215,168,0.18), 0 0 14px rgba(255,215,168,0.7);
+  animation: dotGlow 1.8s ease-in-out infinite;
+}
+@keyframes dotGlow{
+  0%,100%{ transform: scale(1); }
+  50%{ transform: scale(1.35); }
+}
+.timeline__text{
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+  color: var(--text-soft);
+  margin: 0;
+}
+.timeline__item--future .timeline__text{
+  color: var(--gold);
+  font-style: italic;
+}
+
+/* ---------- 6. Finale ---------- */
+
+.finale__content{
+  max-width: 680px;
+}
+.finale__title{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  margin: 0 0 1.8rem;
+  background: linear-gradient(100deg, var(--rose-soft), var(--gold), var(--rose-soft));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.finale__lines{
+  font-family: var(--font-body);
+  font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+  line-height: 1.85;
+  color: var(--text-soft);
+  margin: 0 0 2.6rem;
+}
+.finale__final-message{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.6vw, 1.4rem);
+  color: var(--rose-soft);
+  margin-top: 2.6rem;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 1.2s var(--ease-soft), opacity 1.2s var(--ease-soft);
+}
+.finale__final-message.is-visible{
+  max-height: 300px;
+  opacity: 1;
+}
+
+/* ---------- scroll reveal ---------- */
+
+.reveal{
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease-soft), transform 0.9s var(--ease-soft);
+}
+.reveal.is-visible{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- музыка батырмасы ---------- */
+
+.music-btn{
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  transition: transform 0.3s var(--ease-soft), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.music-btn:hover{
+  transform: translateY(-2px);
+  border-color: rgba(255,180,207,0.5);
+}
+.music-btn:active{
+  transform: translateY(0) scale(0.96);
+}
+.music-btn__icon{
+  font-size: 1rem;
+  transition: transform 0.4s ease;
+}
+.music-btn__bars{
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.music-btn__bars span{
+  width: 2.5px;
+  background: var(--rose-soft);
+  border-radius: 2px;
+  animation: barBounce 0.9s ease-in-out infinite;
+}
+.music-btn__bars span:nth-child(1){ height: 40%; animation-delay: 0s; }
+.music-btn__bars span:nth-child(2){ height: 100%; animation-delay: 0.2s; }
+.music-btn__bars span:nth-child(3){ height: 65%; animation-delay: 0.4s; }
+@keyframes barBounce{
+  0%, 100%{ transform: scaleY(0.4); }
+  50%{ transform: scaleY(1); }
+}
+.music-btn.is-playing .music-btn__icon{
+  transform: rotate(360deg);
+}
+.music-btn.is-playing .music-btn__bars{
+  display: inline-flex;
+}
+.music-btn.is-playing{
+  border-color: rgba(255,111,165,0.6);
+  box-shadow: 0 8px 28px rgba(255,111,165,0.35);
+}
+
+@media (max-width: 520px){
+  .music-btn__text{ display: none; }
+  .music-btn{ padding: 0.6rem 0.75rem; top: 14px; right: 14px; }
+}
+
+/* ---------- конфетти (финалдағы жүректер) ---------- */
+
+.confetti-layer{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  overflow: hidden;
+}
+.confetti-heart{
+  position: absolute;
+  top: -10vh;
+  font-size: 1.4rem;
+  opacity: 0.9;
+  animation: confettiFall linear forwards;
+  will-change: transform;
+}
+@keyframes confettiFall{
+  0%{ transform: translateY(0) rotate(0deg); opacity: 0.95; }
+  100%{ transform: translateY(120vh) rotate(360deg); opacity: 0; }
+}
+
+/* ---------- жалпы адаптация ---------- */
+
+@media (max-width: 640px){
+  .screen{ padding: 7vh 6vw; }
+  .glass-card{ border-radius: 22px; }
+  .confession__text{ text-align: left; }
+}
